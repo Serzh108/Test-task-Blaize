@@ -97,6 +97,7 @@ const Connection = () => {
   const [isTransfering, setIsTransfering] = useState(false);
 
   const buttonHandler = () => {
+    // ethers.utils.isAddress(address) ⇒ boolean  !!!
     if (!signer) {
       return;
     };
@@ -111,16 +112,20 @@ const Connection = () => {
   };
 
   return (
-    <>
+    <Flex direction='column' justify='flex-start' w='60%'>
       <TaskTitle />
 
       <VStack
-        divider={<StackDivider borderColor='gray.400' />}
-        spacing={4}
+        divider={<StackDivider borderColor='gray.200' />}
+        // spacing={4}
         align='center'
-        borderWidth='1px' borderRadius='lg' borderColor='gray'
+        borderRadius='24px'
+        bg='white'
       >
-        <Box p={8} bg='violet' borderWidth='1px' borderRadius='lg' overflow='hidden'>
+        <Box
+          p={8}
+          w='100%'
+        >
           <Flex minWidth='max-content' gap='4'>
             <Input
               value={value}
@@ -131,7 +136,6 @@ const Connection = () => {
               htmlSize={40}
               bg='whitesmoke'
             />
-            {/* <Spacer /> */}
             <Button
               isLoading={isTransfering}
               loadingText='Minting...'
@@ -149,19 +153,35 @@ const Connection = () => {
           emptyColor='gray.200'
           color='green.500'
           size='xl' /> */}
-        <Flex w='100%' direction='column' p={8} bg='violet' borderWidth='1px' borderRadius='lg'>
+        <Flex
+          w='100%'
+          direction='column'
+          p={8}
+        >
           <Flex
             direction='row'
             justify='space-between'
+            p={2}
             color='white'
             bgGradient="linear(to-l, #c24fb6 6.59%,#3f51b8 94.04%)"
+            borderWidth='1px'
+            borderTopRadius='8px'
           >
             <Text>Youe Transactions</Text><Text>Time</Text>
           </Flex>
-          <Flex direction='row' justify='space-between' bg='white'><Text>0x12345678909</Text><Text>19 hours ago</Text></Flex>
+          <Flex
+            direction='row'
+            justify='space-between'
+            p={2}
+            bg='white'
+            borderWidth='1px'
+            borderTopWidth='0px'
+            borderBottomRadius='8px'>
+            <Text>0x12345678909</Text><Text>19 hours ago</Text>
+          </Flex>
         </Flex>
       </VStack>
-    </>
+    </Flex>
   )
 };
 

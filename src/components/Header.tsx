@@ -9,7 +9,7 @@ const Header = () => {
       w="100%"
       py={2}
       px={4}
-      bgGradient="linear(to-l, #c24fb6 6.59%,#3f51b8 94.04%)">
+      bgGradient="linear(269.26deg,#ac35a0 6.59%,#2f42aa 94.04%)">
       <Text color="white">Developed by Serzh108</Text>
       <Box>
         <a
