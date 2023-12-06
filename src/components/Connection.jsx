@@ -3,8 +3,9 @@ import React, { useState, useEffect } from 'react';
 import { ethers } from "ethers";
 import { testContractAddress } from '../constants/constants';
 import testAbi from '../constants/abis/testAbi.json';
+import TaskTitle from '@/components/TaskTitle';
 
-import { Flex, Spacer, Input, Button, Spinner, Box } from '@chakra-ui/react';
+import { Flex, Spacer, Input, Button, Spinner, Box, Text, Heading, VStack, StackDivider } from '@chakra-ui/react';
 
 const firstAddress = '0xAd6441d8aE550706665918d0A41C8f6A76949928';
 const secondAddress = '0xe957C19ccb222c8DdF4A50B5A7ea7F2392EBd377';
@@ -111,35 +112,55 @@ const Connection = () => {
 
   return (
     <>
-      <h1> Connection </h1>
-      <h2> Use Ethers.js</h2>
-      <Box borderWidth='1px' borderRadius='lg' overflow='hidden'>
-        <Flex minWidth='max-content' gap='4'>
-          <Input
-            value={value}
-            onChange={handleChange}
-            placeholder='Enter Your Walletr Address (0x...)'
-            size='lg'
-            variant='outline'
-            htmlSize={40}
-          />
-          {/* <Spacer /> */}
-          <Button
-            isLoading={isTransfering}
-            loadingText='Minting...'
-            colorScheme='facebook'
-            size='lg'
-            onClick={buttonHandler}
+      <TaskTitle />
+
+      <VStack
+        divider={<StackDivider borderColor='gray.400' />}
+        spacing={4}
+        align='center'
+        borderWidth='1px' borderRadius='lg' borderColor='gray'
+      >
+        <Box p={8} bg='violet' borderWidth='1px' borderRadius='lg' overflow='hidden'>
+          <Flex minWidth='max-content' gap='4'>
+            <Input
+              value={value}
+              onChange={handleChange}
+              placeholder='Enter Your Walletr Address (0x...)'
+              size='lg'
+              variant='outline'
+              htmlSize={40}
+              bg='whitesmoke'
+            />
+            {/* <Spacer /> */}
+            <Button
+              isLoading={isTransfering}
+              loadingText='Minting...'
+              colorScheme='facebook'
+              size='lg'
+              onClick={buttonHandler}
+              _hover={{ bg: 'facebook.800', color: 'yellow' }}
+            >
+              Mint
+            </Button>
+          </Flex>
+        </Box>
+        {/* <Spinner thickness='6px'
+          speed='0.95s'
+          emptyColor='gray.200'
+          color='green.500'
+          size='xl' /> */}
+        <Flex w='100%' direction='column' p={8} bg='violet' borderWidth='1px' borderRadius='lg'>
+          <Flex
+            direction='row'
+            justify='space-between'
+            color='white'
+            bgGradient="linear(to-l, #c24fb6 6.59%,#3f51b8 94.04%)"
           >
-            Mint
-          </Button>
+            <Text>Youe Transactions</Text><Text>Time</Text>
+          </Flex>
+          <Flex direction='row' justify='space-between' bg='white'><Text>0x12345678909</Text><Text>19 hours ago</Text></Flex>
         </Flex>
-      </Box>
-      <Spinner thickness='6px'
-        speed='0.95s'
-        emptyColor='gray.200'
-        color='green.500'
-        size='xl' />
+      </VStack>
     </>
   )
 };
