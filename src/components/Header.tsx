@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import { Flex, Box, Text } from '@chakra-ui/react';
 
 const Header = () => {
@@ -16,7 +17,7 @@ const Header = () => {
           href="https://www.linkedin.com/in/serhii-zhykhariev-678b0a78/"
           target="_blank"
           rel="noopener noreferrer">
-          <img src="/logo.svg" alt="Logo" width={40} height={40} />
+          <Image src="/logo.svg" alt="Logo" width={40} height={40} />
         </a>
       </Box>
     </Flex>
