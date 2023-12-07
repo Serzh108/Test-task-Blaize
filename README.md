@@ -34,3 +34,19 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+## Helper
+// Convert user-provided strings in ether to wei for a value
+eth = parseEther('1.0');
+// 1000000000000000000n
+
+// Convert user-provided strings in gwei to wei for max base fee
+feePerGas = parseUnits('4.5', 'gwei');
+// 4500000000n
+
+// Convert a value in wei to a string in ether to display in a UI
+formatEther(eth);
+// '1.0'
+
+// Convert a value in wei to a string in gwei to display in a UI
+formatUnits(feePerGas, 'gwei');
+// '4.5'

@@ -1,5 +1,5 @@
 import Image from 'next/image';
-import { Flex, Box, Text } from '@chakra-ui/react';
+import { Flex, Box, Text, Link } from '@chakra-ui/react';
 
 const Header = () => {
   return (
@@ -13,12 +13,11 @@ const Header = () => {
       bgGradient="linear(269.26deg,#ac35a0 6.59%,#2f42aa 94.04%)">
       <Text color="white">Developed by Serzh108</Text>
       <Box>
-        <a
+        <Link
           href="https://www.linkedin.com/in/serhii-zhykhariev-678b0a78/"
-          target="_blank"
-          rel="noopener noreferrer">
+          isExternal>
           <Image src="/logo.svg" alt="Logo" width={40} height={40} />
-        </a>
+        </Link>
       </Box>
     </Flex>
   );
