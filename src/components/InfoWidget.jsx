@@ -103,7 +103,7 @@ const InfoWidget = () => {
         </Box>
 
         <Box p={2} w='100%' fontSize='md'>
-          <Text textAlign='center'> Your Wallet Address: {signer ? signer.address : '-'}</Text>
+          <Text textAlign='center' color={signer ? 'black' : 'red'}>{signer ? `Your Wallet Address: ${signer.address}` : 'Connect your wallet'}</Text>
         </Box>
 
         <Box p={2} pb={0} w='100%' fontSize='md'>
@@ -135,6 +135,7 @@ const InfoWidget = () => {
               fontSize='md'
               onClick={buttonHandler}
               _hover={{ bg: 'facebook.800', color: 'yellow' }}
+              isDisabled={!signer}
             >
               Mint
             </Button>
