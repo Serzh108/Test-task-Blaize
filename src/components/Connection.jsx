@@ -4,6 +4,7 @@ import { ethers } from "ethers";
 import { testContractAddress } from '../constants/constants';
 import testAbi from '../constants/abis/testAbi.json';
 import TaskTitle from '@/components/TaskTitle';
+import { useProvider } from '../utils/hooks';
 
 import { Flex, Spacer, Input, Button, Spinner, Box, Text, Heading, VStack, StackDivider } from '@chakra-ui/react';
 
@@ -11,29 +12,44 @@ const firstAddress = '0xAd6441d8aE550706665918d0A41C8f6A76949928';
 const secondAddress = '0xe957C19ccb222c8DdF4A50B5A7ea7F2392EBd377';
 
 const Connection = () => {
-  const [signer, setSigner] = useState(null);
-  const [provider, setProvider] = useState(null);
-  const [value, setValue] = React.useState('');
+  const { provider, signer } = useProvider();
 
-  const handleChange = (event) => setValue(event.target.value);
+  // const [signer, setSigner] = useState(null);
+  // const [provider, setProvider] = useState(null);
+  const [userBalance, setUserBalance] = useState(0);
+  const [tokenSymbol, setTokenSymbol] = useState('');
+  const [tokenBalance, setTokenBalance] = useState(0);
+  const [value, setValue] = React.useState('');
+  const [inputError, setInputError] = useState(false);
+  const [isTransfering, setIsTransfering] = useState(false);
+
+  const handleChange = (event) => {
+    setValue(event.target.value);
+    setInputError(false);
+  }
 
   const getBalance = async () => {
     const balance = await provider.getBalance(signer.address);
     console.log(" Balance -> ", balance, ' : ', ethers.formatEther(balance));
+    const formattedBalance = ethers.formatEther(balance);
+    setUserBalance(formattedBalance);
   };
 
   const getContractData = async (contract) => {
+    console.log('  ---- getContractData run !!!!!!!');
     const symb = await contract.symbol();
     const decimals = await contract.decimals();
     const name = await contract.name();
-    const onContractBalance1 = await contract.balanceOf(firstAddress);
-    const onContractBalance2 = await contract.balanceOf(secondAddress);
+    const onContractBalance = await contract.balanceOf(signer.address);
 
-    console.log(' -- symb: ', symb, ', name: ', name, ', decimals: ', decimals, ', onContractBalance #1: ', onContractBalance1);
-    console.log(' --- onContractBalance #2: ', onContractBalance2, ', -> ', ethers.formatEther(onContractBalance2));
+    console.log(' -- symb: ', symb, ', name: ', name, ', decimals: ', decimals);
+    console.log(' --- onContractBalance: ', onContractBalance, ', -> ', ethers.formatEther(onContractBalance));
+    setTokenBalance(ethers.formatEther(onContractBalance));
+    setTokenSymbol(symb);
   };
 
   const mintOnContract = async (contract, amount, signer) => {
+    console.log('  ---- mintOnContract run !!!!!!!');
     const amount0 = ethers.parseEther(amount.toString(), 18);
     console.log(' !! amount ---> ', amount, ' - ', amount0);
     console.log(' !! contract ---> ', contract);
@@ -42,6 +58,11 @@ const Connection = () => {
     console.log(' pref ---> ', pref);
     const res = await pref.wait();
     console.log(' res ---> ', res, ' status = ', res.status ? 'success' : 'revert');
+    console.log(' res.hash ---> ', res.hash);
+    setIsTransfering(false);
+    // --- - ---
+    const testContract = new ethers.Contract(testContractAddress, testAbi, provider);
+    getContractData(testContract);
   };
 
   const sendValue = async (toAddress) => {
@@ -54,67 +75,51 @@ const Connection = () => {
     console.log(' receipt ->', receipt)
   }
   // --- - ---
-  useEffect(() => {
-    if (window.ethereum == null) {
-      console.log("MetaMask not installed; using read-only defaults");
-      const initProvider = ethers.getDefaultProvider();
-      setProvider(initProvider);
-      console.log(" initProvider #1 -> ", initProvider);
-    } else {
-      const initProvider = new ethers.BrowserProvider(window.ethereum);
-      setProvider(initProvider);
-      console.log(" initProvider #2 -> ", initProvider);
-    }
-  }, [])
-
-  useEffect(() => {
-    const getSigner = async () => {
-      console.log(" provider ## -> ", provider);
-      const signerInit = await provider.getSigner();
-      console.log(" signerInit -> ", signerInit);
-      setSigner(signerInit);
-      // sendValue(firstAddress); !!! Tested - succesfuly -> Transaction Hash: 0x95718f76ef17f0ea1246603e92636e44fb2c953135f85edb29dd0cd53aae8ebe
-    }
-    if (provider) {
-      getSigner();
-    }
-  }, [provider]);
 
   // --- TEMP ! ---
-  if (provider) {
-    const testContract = new ethers.Contract(testContractAddress, testAbi, provider);
-    getContractData(testContract);
-  }
+  useEffect(() => {
+    if (provider && signer) {
+      const testContract = new ethers.Contract(testContractAddress, testAbi, provider);
+      getContractData(testContract);
+    }
+  }, [provider, signer?.address]);
   // --- / TEMP ! ---
 
-  if (signer) {
-    // console.log(' !!#!! signer ---> ', signer);
-    // const testContractWrite = new ethers.Contract(testContractAddress, testAbi, signer);
-    // mintOnContract(testContractWrite, 0.01, signer);
-    getBalance();
-  }
+  useEffect(() => {
+    //   if (signer) {
+    //     getBalance();
+    //   }
+    if (signer && signer.address) {
+      setValue(signer.address);
+    }
+  }, [signer]);
 
-  const [isTransfering, setIsTransfering] = useState(false);
 
   const buttonHandler = () => {
-    // ethers.utils.isAddress(address) ⇒ boolean  !!!
+    console.log('  ---- buttonHandler clicked!!!!!!!');
     if (!signer) {
       return;
     };
-
-    // ---
-    setIsTransfering(prev => !prev);
-    // --- **
-
-    console.log(' !!#!! signer ---> ', signer);
-    const testContractWrite = new ethers.Contract(testContractAddress, testAbi, signer);
-    // mintOnContract(testContractWrite, 0.01, signer);
+    const checkAddress = ethers.isAddress(value);
+    // --- 
+    if (checkAddress) {
+      console.log('  ---- checkAddress true !!!!!!!');
+      setInputError(false);
+      setIsTransfering(true);
+      const testContractWrite = new ethers.Contract(testContractAddress, testAbi, signer);
+      mintOnContract(testContractWrite, 0.001, signer);
+    } else {
+      setInputError(true);
+    }
   };
+
 
   return (
     <Flex direction='column' justify='flex-start' w='60%'>
       <TaskTitle />
-
+      {/* --- TEMP! */}
+      {/* <Text>Balance: {userBalance}</Text> */}
+      {/* --- / TEMP! */}
       <VStack
         divider={<StackDivider borderColor='gray.200' />}
         // spacing={4}
@@ -122,37 +127,51 @@ const Connection = () => {
         borderRadius='24px'
         bg='white'
       >
+
+        <Box
+          p={4}
+          pb={2}
+          w='100%'
+          fontSize='16px'
+        >
+          <Text textAlign='center'>
+            {`Your Token Balance: ${tokenBalance} ${tokenSymbol}`}
+          </Text>
+        </Box>
+
         <Box
           p={8}
+          pb={2}
           w='100%'
+          fontSize='16px'
         >
-          <Flex minWidth='max-content' gap='4'>
+          {/* <Flex minWidth='max-content' gap='4'> */}
+          <Flex gap='4'>
             <Input
               value={value}
               onChange={handleChange}
               placeholder='Enter Your Walletr Address (0x...)'
               size='lg'
+              fontSize='md'
               variant='outline'
               htmlSize={40}
               bg='whitesmoke'
+              p={2}
             />
             <Button
               isLoading={isTransfering}
               loadingText='Minting...'
               colorScheme='facebook'
               size='lg'
+              fontSize='md'
               onClick={buttonHandler}
               _hover={{ bg: 'facebook.800', color: 'yellow' }}
             >
               Mint
             </Button>
           </Flex>
+          <Text fontSize='xs' color={inputError ? 'red' : 'transparent'} textAlign='center' pt='4px'>Wrong Wallet Address!</Text>
         </Box>
-        {/* <Spinner thickness='6px'
-          speed='0.95s'
-          emptyColor='gray.200'
-          color='green.500'
-          size='xl' /> */}
         <Flex
           w='100%'
           direction='column'
@@ -167,7 +186,7 @@ const Connection = () => {
             borderWidth='1px'
             borderTopRadius='8px'
           >
-            <Text>Youe Transactions</Text><Text>Time</Text>
+            <Text>Your Transactions</Text><Text w='110px' textAlign='left'>Time</Text>
           </Flex>
           <Flex
             direction='row'
@@ -177,7 +196,7 @@ const Connection = () => {
             borderWidth='1px'
             borderTopWidth='0px'
             borderBottomRadius='8px'>
-            <Text>0x12345678909</Text><Text>19 hours ago</Text>
+            <Text>0x12345678909</Text><Text w='110px' textAlign='left'>19 hours ago</Text>
           </Flex>
         </Flex>
       </VStack>
